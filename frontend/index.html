@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BMR</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- 🔐 LOGIN (FIXED STRUCTURE) -->
+        <div id="authSection" style="display: none;">
+
+            <div class="card center-card">
+                <h2>Welcome back</h2>
+                <p class="sub">Login to continue</p>
+
+                <input id="username" placeholder="Username">
+                <input id="password" type="password" placeholder="Password">
+
+                <button onclick="login()">Login</button>
+                <button class="secondary" onclick="signup()">Signup</button>
+            </div>
+
+        </div>
+
+        <!-- 🧠 MAIN APP -->
+        <div id="appSection" class="main-layout" style="display:none;">
+
+            <!-- LEFT (INPUT) -->
+            <div class="panel input-panel">
+
+                <div class="header">
+                    <h2>BMR Calculator</h2>
+                </div>
+
+                <input id="age" placeholder="Age">
+                <input id="weight" placeholder="Weight (kg)">
+                <input id="height" placeholder="Height (cm)">
+
+                <select id="gender">
+                    <option value="">Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+
+                <select id="activity">
+                    <option value="sedentary">Sedentary</option>
+                    <option value="light">Light</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="active">Active</option>
+                </select>
+
+                <select id="goal">
+                    <option value="maintain">Maintain</option>
+                    <option value="loss">Weight Loss</option>
+                    <option value="gain">Weight Gain</option>
+                </select>
+
+                <select id="diet">
+                    <option value="veg">Veg</option>
+                    <option value="nonveg">Non-Veg</option>
+                </select>
+
+                <!-- ACTION BAR -->
+                <div class="action-bar">
+                    <button class="btn primary" onclick="calculateBMR()">
+                        ⚡ Calculate
+                    </button>
+
+                    <button class="btn danger" onclick="logout()">
+                        🚪 Logout
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT (OUTPUT) -->
+            <div class="panel output-panel">
+
+                <h2>📊 Your Report</h2>
+
+                <div id="result" class="result-card">
+                    Fill details to generate report
+                </div>
+
+                <h3>History</h3>
+                <div id="historyList"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
