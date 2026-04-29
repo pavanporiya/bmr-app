@@ -136,7 +136,7 @@ def verify_token(auth_header):
 
 @app.route('/')
 def home():
-    return "API is running"
+    return {"status": "Backend is live 🚀"}
 
 @app.route('/signup', methods=['POST'])
 def signup():
