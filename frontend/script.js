@@ -218,9 +218,31 @@ function renderResult(data) {
     const d = data.data;
 
     document.getElementById("result").innerHTML = `
-        <h3>Result</h3>
-        BMR: ${d.bmr} <br>
-        TDEE: ${d.tdee} <br>
-        Calories: ${d.target_calories}
+        <h3>🔥 Fitness Report</h3>
+
+        BMR: <b>${d.bmr}</b><br>
+        TDEE: <b>${d.tdee}</b><br>
+        Calories: <b>${d.target_calories}</b>
+
+        <div class="macros">
+            <div>Protein: ${d.macros.protein}g</div>
+            <div>Fat: ${d.macros.fat}g</div>
+            <div>Carbs: ${d.macros.carbs}g</div>
+        </div>
+
+        <hr>
+
+        <b>🥗 Diet:</b><br>
+        ${d.diet.join(", ")}
+
+        <br><br>
+
+        <b>🏋️ Workout:</b><br>
+        ${d.workout}
+
+        <br><br>
+
+        <b>🧠 Insight:</b><br>
+        ${d.insight}
     `;
 }
