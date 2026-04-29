@@ -134,6 +134,10 @@ def verify_token(auth_header):
     except jwt.InvalidTokenError:
         return None, "Invalid token"
 
+@app.route('/')
+def home():
+    return "API is running"
+
 @app.route('/signup', methods=['POST'])
 def signup():
     try:
