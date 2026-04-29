@@ -1,7 +1,8 @@
 let userId = null;
 let token = null;
 
-// 🔥 CHECK SESSION ON LOAD
+const API = "https://bmr-backend-no2v.onrender.com";
+
 window.onload = function () {
     const saved = localStorage.getItem("token");
 
@@ -19,48 +20,21 @@ function showAuth() {
     document.getElementById("appSection").style.display = "none";
 }
 
-// 🔐 SHOW APP
 function showApp() {
-    const auth = document.getElementById("authSection");
-    const app = document.getElementById("appSection");
-
-    auth.classList.add("fade-out");
-
-    setTimeout(() => {
-        auth.style.display = "none";
-        auth.classList.remove("fade-out");
-    }, 300);
-
-    app.style.display = "flex";
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("appSection").style.display = "flex";
 }
 
-// 🔐 SHOW LOGIN
-function showAuth() {
-    const auth = document.getElementById("authSection");
-    const app = document.getElementById("appSection");
-
-    app.style.display = "none";
-    auth.style.display = "flex";
-
-    setTimeout(() => {
-        auth.classList.remove("fade-out");
-    }, 10);
-}
-
-// 🔐 LOGOUT
 function logout() {
     userId = null;
     token = null;
-
     localStorage.removeItem("token");
-
     showAuth();
 }
 
-// 🔐 SIGNUP (🔥 LOADING ADDED)
-async function signup() {
-    const btn = event.target;
-    btn.innerText = "Creating account...";
+async function signup(e) {
+    const btn = e.target;
+    btn.innerText = "Creating...";
     btn.disabled = true;
 
     const username = document.getElementById("username").value.trim();
@@ -74,16 +48,21 @@ async function signup() {
     }
 
     try {
-        const res = await fetch("https://bmr-backend-no2v.onrender.com/signup", {
+        const res = await fetch(API + "/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
         });
 
         const data = await res.json();
-        alert(data.success ? "Signup success" : data.error);
 
-    } catch {
+        if (data.success) {
+            alert("Signup success");
+        } else {
+            alert(data.error);
+        }
+
+    } catch (err) {
         alert("Server error");
     }
 
@@ -91,9 +70,8 @@ async function signup() {
     btn.disabled = false;
 }
 
-// 🔑 LOGIN (🔥 LOADING ADDED)
-async function login() {
-    const btn = event.target;
+async function login(e) {
+    const btn = e.target;
     btn.innerText = "Logging in...";
     btn.disabled = true;
 
@@ -108,9 +86,8 @@ async function login() {
     }
 
     try {
-        const res = await fetch("https://bmr-backend-no2v.onrender.com/login", {
+        const res = await fetch(API + "/login", {
             method: "POST",
-            mode: "cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
         });
@@ -120,14 +97,13 @@ async function login() {
         if (data.success) {
             token = data.token;
             localStorage.setItem("token", token);
-
             showApp();
             loadHistory();
         } else {
-            alert("Login failed");
+            alert(data.error);
         }
 
-    } catch {
+    } catch (err) {
         alert("Server error");
     }
 
@@ -135,17 +111,15 @@ async function login() {
     btn.disabled = false;
 }
 
-// 🧠 VALIDATION
 function validateInputs(age, weight, height, gender) {
     if (!age || !weight || !height || !gender) return "All fields required";
     if (age <= 0 || age > 120) return "Invalid age";
     if (weight <= 0 || weight > 300) return "Invalid weight";
     if (height <= 50 || height > 300) return "Invalid height";
-    if (!["male", "female"].includes(gender)) return "Invalid gender";
+    if (gender !== "male" && gender !== "female") return "Invalid gender";
     return null;
 }
 
-// 🚀 CALCULATE (🔥 IMPROVED LOADER)
 async function calculateBMR() {
     if (!token) {
         alert("Login first");
@@ -157,29 +131,27 @@ async function calculateBMR() {
     btn.disabled = true;
 
     const resultDiv = document.getElementById("result");
-
-    // 🔥 spinner UI
-    resultDiv.innerHTML = `<div class="loader"></div><p style="text-align:center;">Calculating your plan...</p>`;
+    resultDiv.innerHTML = "Calculating...";
 
     const age = parseInt(document.getElementById("age").value);
     const weight = parseFloat(document.getElementById("weight").value);
     const height = parseFloat(document.getElementById("height").value);
     const gender = document.getElementById("gender").value;
 
-    const activity = document.getElementById("activity")?.value || "sedentary";
-    const goal = document.getElementById("goal")?.value || "maintain";
-    const diet = document.getElementById("diet")?.value || "veg";
+    const activity = document.getElementById("activity").value;
+    const goal = document.getElementById("goal").value;
+    const diet = document.getElementById("diet").value;
 
     const error = validateInputs(age, weight, height, gender);
     if (error) {
         alert(error);
-        btn.disabled = false;
         btn.innerText = "Calculate";
+        btn.disabled = false;
         return;
     }
 
     try {
-        const res = await fetch("https://bmr-backend-no2v.onrender.com/calculate", {
+        const res = await fetch(API + "/calculate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -189,22 +161,22 @@ async function calculateBMR() {
         });
 
         const data = await res.json();
-
         renderResult(data);
         loadHistory();
 
-    } catch {
+    } catch (err) {
         resultDiv.innerText = "Server error";
     }
 
-    btn.disabled = false;
     btn.innerText = "Calculate";
+    btn.disabled = false;
 }
 
-// 📊 HISTORY
 async function loadHistory() {
+    if (!token) return;
+
     try {
-        const res = await fetch("https://bmr-backend-no2v.onrender.com/history", {
+        const res = await fetch(API + "/history", {
             headers: { "Authorization": "Bearer " + token }
         });
 
@@ -219,34 +191,24 @@ async function loadHistory() {
             const div = document.createElement("div");
 
             div.innerHTML = `
-                <strong>${item.gender.toUpperCase()}</strong> | Age: ${item.age}
+                <strong>${item.gender}</strong> | Age: ${item.age}
                 <br>BMR: ${item.bmr}
-                <button onclick="deleteRecord(${item.id})">✖</button>
+                <button onclick="deleteRecord(${item.id})">X</button>
             `;
 
             list.appendChild(div);
         });
 
-    } catch (err) {
-        console.error(err);
-    }
+    } catch (err) { }
 }
 
-// ❌ DELETE (🔥 LOADING FEEDBACK)
 function deleteRecord(id) {
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerText = "Deleting...";
-
-    fetch(`https://bmr-backend-no2v.onrender.com/delete/${id}`, {
+    fetch(API + "/delete/" + id, {
         method: "DELETE",
         headers: { "Authorization": "Bearer " + token }
-    }).then(() => {
-        loadHistory();
-        resultDiv.innerText = "Deleted successfully";
-    });
+    }).then(() => loadHistory());
 }
 
-// 📊 RESULT
 function renderResult(data) {
     if (!data.success) {
         document.getElementById("result").innerText = data.error;
@@ -256,19 +218,9 @@ function renderResult(data) {
     const d = data.data;
 
     document.getElementById("result").innerHTML = `
-        <h3>Fitness Report</h3>
-        BMR: <b>${d.bmr}</b><br>
-        TDEE: <b>${d.tdee}</b><br>
-        Calories: <b>${d.target_calories}</b>
-
-        <div class="macros">
-            <div class="macro-box">Protein<br>${d.macros.protein}g</div>
-            <div class="macro-box">Fat<br>${d.macros.fat}g</div>
-            <div class="macro-box">Carbs<br>${d.macros.carbs}g</div>
-        </div>
-
-        <div class="info-box"><b>Diet:</b><br>${d.diet.join(", ")}</div>
-        <div class="info-box"><b>Workout:</b><br>${d.workout}</div>
-        <div class="info-box"><b>Insight:</b><br>${d.insight}</div>
+        <h3>Result</h3>
+        BMR: ${d.bmr} <br>
+        TDEE: ${d.tdee} <br>
+        Calories: ${d.target_calories}
     `;
 }
