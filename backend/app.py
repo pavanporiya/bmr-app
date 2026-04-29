@@ -185,17 +185,13 @@ def login():
 
     if isinstance(stored_hash, str):
         stored_hash = stored_hash.encode('utf-8')
-    
-    if not bcrypt.checkpw(password.encode('utf-8'), stored_hash):
-        return jsonify({"success": False, "error": "Invalid credentials"})
-
-    # 🔐 Password check
+        # 🔐 Password check
     
     try:
         if not bcrypt.checkpw(password.encode('utf-8'), stored_hash):
             return jsonify({"success": False, "error": "Invalid credentials"})
     except ValueError:
-        return jsonify({"success": False, "error": "Invalid password format (rehash required)"})
+        return jsonify({"success": False, "error": "Invalid password format )"})
 
     # 🔥 JWT with expiry
     token = jwt.encode({
