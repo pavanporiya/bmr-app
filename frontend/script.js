@@ -74,7 +74,7 @@ async function signup() {
     }
 
     try {
-        const res = await fetch("http://127.0.0.1:5000/signup", {
+        const res = await fetch("http://https://bmr-backend-no2v.onrender.com/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -108,7 +108,7 @@ async function login() {
     }
 
     try {
-        const res = await fetch("http://127.0.0.1:5000/login", {
+        const res = await fetch("http://https://bmr-backend-no2v.onrender.com/login", {
             method: "POST",
             mode: "cors",
             headers: { "Content-Type": "application/json" },
@@ -179,7 +179,7 @@ async function calculateBMR() {
     }
 
     try {
-        const res = await fetch("http://127.0.0.1:5000/calculate", {
+        const res = await fetch("http://https://bmr-backend-no2v.onrender.com/calculate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -204,7 +204,7 @@ async function calculateBMR() {
 // 📊 HISTORY
 async function loadHistory() {
     try {
-        const res = await fetch("http://127.0.0.1:5000/history", {
+        const res = await fetch("http://https://bmr-backend-no2v.onrender.com/history", {
             headers: { "Authorization": "Bearer " + token }
         });
 
@@ -237,7 +237,7 @@ function deleteRecord(id) {
     const resultDiv = document.getElementById("result");
     resultDiv.innerText = "Deleting...";
 
-    fetch(`http://127.0.0.1:5000/delete/${id}`, {
+    fetch(`http://https://bmr-backend-no2v.onrender.com/delete/${id}`, {
         method: "DELETE",
         headers: { "Authorization": "Bearer " + token }
     }).then(() => {
