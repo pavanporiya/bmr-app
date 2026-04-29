@@ -31,13 +31,12 @@ CORS(app,
 # 🔌 DB CONNECTION
 def get_connection():
     return psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASS"),
-    port=os.getenv("DB_PORT"),
-    sslmode="require"
-
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASS"),
+        port=os.getenv("DB_PORT"),
+        sslmode="require"
     )
 
 # 🧠 BMR LOGIC
@@ -135,32 +134,40 @@ def verify_token(auth_header):
     except jwt.InvalidTokenError:
         return None, "Invalid token"
 
-
-# 🔐 SIGNUP
 @app.route('/signup', methods=['POST'])
 def signup():
-    data = request.json
-    username = data['username']
-    password = data['password']
-
-    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
     try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"success": False, "error": "Invalid JSON"}), 400
+
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({"success": False, "error": "Missing fields"}), 400
+
+        # 🔐 HASH PASSWORD
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
         cursor.execute(
             "INSERT INTO users (username, password) VALUES (%s, %s)",
-            (username, hashed)
+            (username, hashed.decode('utf-8'))
         )
+
         conn.commit()
-        return jsonify({"success": True})
-    except:
-        return jsonify({"success": False, "error": "User already exists"})
-    finally:
         cursor.close()
         conn.close()
 
+        return jsonify({"success": True, "message": "User created successfully"})
+
+    except Exception as e:
+        print("SIGNUP ERROR:", str(e))  # 🔥 LOG IMPORTANT
+        return jsonify({"success": False, "error": "Server error"}), 500
 
 # 🔑 LOGIN (HARDENED JWT)
 @app.route('/login', methods=['POST'])
